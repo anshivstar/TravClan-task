@@ -8,6 +8,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import { DataContext } from '../ContextApi/data'
+import { useHistory } from 'react-router-dom';
 
 
 const StyledTableCell = withStyles((theme) => ({
@@ -26,6 +27,7 @@ const StyledTableRow = withStyles((theme) => ({
     root: {
         '&:nth-of-type(odd)': {
             backgroundColor: theme.palette.action.hover,
+          
         },
     },
 }))(TableRow);
@@ -42,8 +44,12 @@ export default function CustomizedTables() {
     const classes = useStyles();
 
     const [toggle, setToggle] = useState(true)
-        
-    
+
+    const history = useHistory()
+
+    const Pushed = (id) =>{
+        history.push(`/detail/${id}`)
+    }
 
 
     return (
@@ -57,25 +63,27 @@ export default function CustomizedTables() {
                         <StyledTableCell align="center">Phone No.</StyledTableCell>
                         <StyledTableCell align="center">Premium</StyledTableCell>
                         <StyledTableCell align="center">Max/Min bid</StyledTableCell>
-                        <StyledTableCell align="center"><button onClick={()=>setToggle(prev=>!prev)} style={{padding:"4px 10px"}}>{toggle ? "Minimum" : "Maximum"}</button></StyledTableCell>
+                        <StyledTableCell align="center"><button onClick={() => setToggle(prev => !prev)} style={{ padding: "4px 10px" }}>{toggle ? "Minimum" : "Maximum"}</button></StyledTableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
                     {
-                       data &&data.map((data, i) => (
+                        data &&
+                        data.sort((a, b) => a.bids[0] ? (toggle ? (b.bids.sort((a, b) => b.amount - a.amount)[0].amount - a.bids.sort((a, b) => b.amount - a.amount)[0].amount) : (a.bids.sort((a, b) => a.amount - b.amount)[0].amount - b.bids.sort((a, b) => a.amount - b.amount)[0].amount)) : null)
+                            .map((data, i) => (
 
-                            <StyledTableRow key={data.id}>
-                                <StyledTableCell align="center" component="th" scope="row">
-                                    <img src={data.avatarUrl} height="35" width="35" style={{ borderRadius: "20px" }} />
-                                </StyledTableCell>
-                                <StyledTableCell align="center">{data.firstname}</StyledTableCell>
-                                <StyledTableCell align="center">{data.email}</StyledTableCell>
-                                <StyledTableCell align="center">{data.phone}</StyledTableCell>
-                                <StyledTableCell align="center">{data.hasPremium ? "Yes" : "No"}</StyledTableCell>
-                                <StyledTableCell align="center">{toggle ? (data.bids.sort((a, b) => b.amount - a.amount)[0] ? data.bids.sort((a, b) => b.amount - a.amount)[0].amount : null) : (data.bids.sort((a, b) => b.amount - a.amount)[0] ? data.bids.sort((a, b) => a.amount - b.amount)[0].amount : null) }</StyledTableCell>
-                                <StyledTableCell align="center"></StyledTableCell>
-                            </StyledTableRow>
-                        ))
+                                <StyledTableRow key={data.id} onClick={()=>Pushed(data.id)} style={{cursor:"pointer"}}>
+                                    <StyledTableCell align="center" component="th" scope="row">
+                                        <img src={data.avatarUrl} height="35" width="35" style={{ borderRadius: "20px" }} alt='avatar'/>
+                                    </StyledTableCell>
+                                    <StyledTableCell align="center">{data.firstname}</StyledTableCell>
+                                    <StyledTableCell align="center">{data.email}</StyledTableCell>
+                                    <StyledTableCell align="center">{data.phone}</StyledTableCell>
+                                    <StyledTableCell align="center">{data.hasPremium ? "Yes" : "No"}</StyledTableCell>
+                                    <StyledTableCell align="center">{toggle ? (data.bids.sort((a, b) => b.amount - a.amount)[0] ? data.bids.sort((a, b) => b.amount - a.amount)[0].amount : null) : (data.bids.sort((a, b) => b.amount - a.amount)[0] ? data.bids.sort((a, b) => a.amount - b.amount)[0].amount : null)}</StyledTableCell>
+                                    <StyledTableCell align="center"></StyledTableCell>
+                                </StyledTableRow>
+                            ))
                     }
 
                 </TableBody>
