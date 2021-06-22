@@ -9,7 +9,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import { DataContext } from '../ContextApi/data'
 import { useHistory } from 'react-router-dom';
-
+import Pagination from './Pagination';
 
 const StyledTableCell = withStyles((theme) => ({
 
@@ -42,7 +42,8 @@ export default function CustomizedTables() {
 
     const { data, setData } = useContext(DataContext)
     const classes = useStyles();
-
+    const [currentPage,setCurrentPage] = useState(1)
+    const [postPerPage,setPostPerPage] = useState(5)
     const [toggle, setToggle] = useState(true)
 
     const history = useHistory()
@@ -51,7 +52,15 @@ export default function CustomizedTables() {
         history.push(`/detail/${id}`)
     }
 
+    const dat = data.sort((a, b) => a.bids[0] ? (toggle ? (  b.bids.sort((a, b) => b.amount - a.amount)[0].amount - a.bids.sort((a, b) => b.amount - a.amount)[0].amount) : (a.bids.sort((a, b) => a.amount - b.amount)[0].amount - b.bids.sort((a, b) => a.amount - b.amount)[0].amount)) : null)
+    
 
+    const lastPostIndex = currentPage * postPerPage
+    const firstPostindex = lastPostIndex - postPerPage
+    const currentPosts = dat.slice(firstPostindex,lastPostIndex)
+    
+
+    const change = (pageNumber) => setCurrentPage(pageNumber)
     return (
         <TableContainer component={Paper}>
             <Table className={classes.table} aria-label="customized table">
@@ -68,9 +77,8 @@ export default function CustomizedTables() {
                 </TableHead>
                 <TableBody>
                     {
-                        data &&
-                        data.sort((a, b) => a.bids[0] ? (toggle ? (b.bids.sort((a, b) => b.amount - a.amount)[0].amount - a.bids.sort((a, b) => b.amount - a.amount)[0].amount) : (a.bids.sort((a, b) => a.amount - b.amount)[0].amount - b.bids.sort((a, b) => a.amount - b.amount)[0].amount)) : null)
-                            .map((data, i) => (
+                        currentPosts &&
+                        currentPosts.map((data, i) => (
 
                                 <StyledTableRow key={data.id} onClick={()=>Pushed(data.id)} style={{cursor:"pointer"}}>
                                     <StyledTableCell align="center" component="th" scope="row">
@@ -88,6 +96,7 @@ export default function CustomizedTables() {
 
                 </TableBody>
             </Table>
+            <Pagination change={change} postsPerPage={postPerPage} totalPosts={Object.keys(data).length} />
         </TableContainer>
     );
 }
